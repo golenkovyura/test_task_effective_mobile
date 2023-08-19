@@ -1,5 +1,5 @@
 from os import path
-from typing import List, Tuple
+from typing import Tuple
 
 
 class Contact:
@@ -65,17 +65,21 @@ class Phonebook:
         self.contacts[index] = new_contact
         self.save_contacts()
 
-    def search_contacts(self, query: str) -> List[Contact]:
+    def search_contacts(self, query: str) -> None:
         """
         Поиск контактов из записной книжки по всем возможным полям.
-        Возвращает список со всеми найденными контактами.
+        Печатает в терминал все найденные контакты
         """
         result = []
         for contact in self.contacts:
             if query in [field.lower().strip() for field in
                          contact.all_fields()]:
                 result.append(contact)
-        return result
+        if result:
+            print("Результаты поиска:")
+            print_valid_contacts(result)
+        else:
+            print("Записей не найдено.")
 
     def display_contacts(self) -> None:
         """
@@ -84,13 +88,7 @@ class Phonebook:
         """
         if len(self.contacts) == 0:
             print('Нет записей в телефонной книге')
-        for index, contact in enumerate(self.contacts):
-            print(
-                f"{index + 1}) {contact.last_name} {contact.first_name} "
-                f"{contact.middle_name}, "
-                f"{contact.organization}, {contact.work_phone}, "
-                f"{contact.personal_phone}"
-            )
+        print_valid_contacts(self.contacts)
 
 
 def entering_information() -> Tuple[str]:
@@ -108,7 +106,21 @@ def entering_information() -> Tuple[str]:
             organization, work_phone, personal_phone)
 
 
-def main():
+def print_valid_contacts(list_of_contacts: list) -> None:
+    """
+    Вспомогательная функция вывода информации о контактах на экран
+    в едином стиле для поиска контактов или полного их вывода в терминал.
+    """
+    for index, contact in enumerate(list_of_contacts):
+        print(
+            f"{index + 1}) {contact.last_name} "
+            f"{contact.first_name} {contact.middle_name}, "
+            f"{contact.organization}, {contact.work_phone}, "
+            f"{contact.personal_phone}"
+        )
+
+
+def main() -> None:
     """Основная функция для запуска программы."""
     phonebook = Phonebook("phonebook.txt")
 
@@ -132,18 +144,7 @@ def main():
                 print("Неверный номер записи.")
         elif choice == '4':
             query = input("Введите строку для поиска: ").lower()
-            results = phonebook.search_contacts(query)
-            if results:
-                print("Результаты поиска:")
-                for index, contact in enumerate(results):
-                    print(
-                        f"{index + 1}) {contact.last_name} "
-                        f"{contact.first_name} {contact.middle_name}, "
-                        f"{contact.organization}, {contact.work_phone}, "
-                        f"{contact.personal_phone}"
-                    )
-            else:
-                print("Записей не найдено.")
+            phonebook.search_contacts(query)
         elif choice == '5':
             break
         else:
@@ -152,3 +153,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
